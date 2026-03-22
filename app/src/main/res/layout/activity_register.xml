@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
-    tools:context=".MainActivity">
+    tools:context="com.example.oskolki.MainActivity">
 
 
     <!-- Фоновое изображение на весь экран -->

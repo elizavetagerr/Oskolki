@@ -12,7 +12,6 @@
 /captures
 .externalNativeBuild
 .cxx
-local.properties
 # Gradle
 .gradle/
 build/
@@ -20,8 +19,6 @@ local.properties
 
 # Android Studio
 .idea/
-*.iml
-.DS_Store
 
 # Build outputs
 *.apk

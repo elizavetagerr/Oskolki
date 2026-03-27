@@ -9,7 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatButton
 import android.content.Intent
-import com.example.Oskolki.R
+import com.example.oskolki.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity() {
         }
         // Кнопка входа
         findViewById<AppCompatButton>(R.id.btn_login).setOnClickListener {
+            val intent = Intent(this, MapActivity::class.java)
+            startActivity(intent)
             val email = findViewById<EditText>(R.id.et_email).text.toString()
             val password = findViewById<EditText>(R.id.et_password).text.toString()
 

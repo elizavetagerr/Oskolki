@@ -1,23 +1,36 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
 
 android {
-    namespace = "com.example.Oskolki"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+    namespace = "com.example.oskolki"
+    compileSdk = 36
+
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
         applicationId = "com.example.Oskolki"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Читаем ключ из secrets.properties
+        val secrets = Properties()
+        val secretsFile = rootProject.file("secrets.properties")
+        if (secretsFile.exists()) {
+            secrets.load(FileInputStream(secretsFile))
+        }
+        val mapsApiKey = secrets.getProperty("MAPS_API_KEY") ?: ""
+
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
     }
 
     buildTypes {
@@ -44,4 +57,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("com.yandex.android:maps.mobile:4.10.0-lite")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.11.0")
 }

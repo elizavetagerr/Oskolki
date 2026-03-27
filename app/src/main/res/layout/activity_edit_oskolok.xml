@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/login_screen"
+        android:scaleType="centerCrop"
+        android:contentDescription="Фоновое изображение" />
+    <!-- Заголовок и адрес -->
+    <LinearLayout
+        android:id="@+id/title_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Музей истории"
+            android:textSize="20sp"
+            android:textColor="#FF0A0A0A"
+            android:textStyle="bold"
+            android:fontFamily="Inter"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/tv_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Политехническая улица, 29 к2 лит Д"
+            android:textSize="14sp"
+            android:textColor="#FF4A5565"
+            android:fontFamily="Inter"
+            android:gravity="center_horizontal" />
+    </LinearLayout>
+
+    <!-- Поле ввода текста -->
+    <EditText
+        android:id="@+id/et_comment"
+        android:layout_width="0dp"
+        android:layout_height="128dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="140dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_rounded_text_area"
+        android:padding="16dp"
+        android:hint="Оставить осколок"
+        android:textSize="16sp"
+        android:textColor="#FF000000"
+        android:textColorHint="#FF6A7282"
+        android:fontFamily="Inter"
+        android:gravity="top"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Кнопка "Добавить фото или видео" -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_add_media"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="290dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_rounded_button"
+        android:text="Добавить фото/видео"
+        android:textSize="16sp"
+        android:textColor="#FF000000"
+        android:fontFamily="Inter"
+        android:textAllCaps="false"
+        android:paddingStart="70dp"
+        android:paddingEnd="70dp"
+        android:drawableStart="@drawable/ic_camera"
+        android:drawablePadding="24dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Кнопка "Оставить аудио" -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_add_audio"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="362dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_rounded_button"
+        android:backgroundTint="@null"
+        android:text="Оставить аудио"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textColor="#FF000000"
+        android:fontFamily="Inter"
+        android:paddingStart="100dp"
+        android:paddingEnd="100dp"
+        android:drawableStart="@drawable/ic_audio"
+        app:iconGravity="textStart"
+        app:iconPadding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Кнопка "Отправить" -->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_submit"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="450dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_rounded_button"
+        android:text="Отправить"
+        android:textSize="20sp"
+        android:textColor="#FF000000"
+        android:fontFamily="Inter"
+        android:textAllCaps="false"
+        android:gravity="center"
+        android:drawablePadding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Кнопка закрытия (крестик) -->
+    <ImageButton
+        android:id="@+id/btn_close"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="39dp"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/ic_exit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

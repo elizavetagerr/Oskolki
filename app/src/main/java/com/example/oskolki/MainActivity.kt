@@ -9,7 +9,6 @@ import androidx.core.view.WindowInsetsCompat
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatButton
 import android.content.Intent
-import com.example.oskolki.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

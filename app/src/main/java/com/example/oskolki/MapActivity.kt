@@ -7,39 +7,37 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.mapview.MapView
+import android.widget.Toast
+
 class MapActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        MapKitFactory.setApiKey(BuildConfig.MAPS_API_KEY)
-        MapKitFactory.initialize(this)
-
         setContentView(R.layout.activity_map)
 
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigation.selectedItemId = R.id.nav_map
 
-        // Обработчик нажатий
         bottomNavigation.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_osk -> {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
+                    Toast.makeText(this, "Раздел в разработке", Toast.LENGTH_SHORT).show()
                     true
                 }
                 R.id.nav_edit -> {
                     startActivity(Intent(this, EditOskolokActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_map -> {
                     true
                 }
                 R.id.nav_cam -> {
-                    // TODO: открыть камеру
+                    startActivity(Intent(this, CameraActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_profile -> {
-                    // TODO: открыть профиль
+                    Toast.makeText(this, "Раздел в разработке", Toast.LENGTH_SHORT).show()
                     true
                 }
                 else -> false

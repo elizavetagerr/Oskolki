@@ -8,7 +8,6 @@
     android:fitsSystemWindows="false"
     tools:context="com.example.oskolki.MainActivity">
 
-
     <!-- Фоновое изображение на весь экран -->
     <ImageView
         android:layout_width="match_parent"

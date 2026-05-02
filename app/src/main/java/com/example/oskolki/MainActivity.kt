@@ -1,5 +1,6 @@
 package com.example.oskolki
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -8,7 +9,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.EditText
 import androidx.appcompat.widget.AppCompatButton
-import android.content.Intent
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.example.oskolki.model.LoginRequest
+import com.example.oskolki.network.RetrofitClient
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,31 +30,42 @@ class MainActivity : AppCompatActivity() {
         }
         // Кнопка входа
         findViewById<AppCompatButton>(R.id.btn_login).setOnClickListener {
-            val intent = Intent(this, MapActivity::class.java)
-            startActivity(intent)
             val email = findViewById<EditText>(R.id.et_email).text.toString()
             val password = findViewById<EditText>(R.id.et_password).text.toString()
 
             // Простая проверка на пустые поля
             if (email.isEmpty() || password.isEmpty()) {
-                // Показать сообщение об ошибке (можно добавить Toast)
-                android.widget.Toast.makeText(this, "Заполните все поля", android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show()
             } else {
-                // Здесь будет логика входа
-                android.widget.Toast.makeText(this, "Вход выполняется...", android.widget.Toast.LENGTH_SHORT).show()
-                // TODO: Добавить авторизацию
+                lifecycleScope.launch {
+                    try {
+                        val response = RetrofitClient.apiService.login(LoginRequest(email, password))
+                        val sharedPref = getSharedPreferences("auth_prefs", MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("token", response.token)
+                            putString("user_id", response.user.id)
+                            apply()
+                        }
+                        Toast.makeText(this@MainActivity, "Вход выполнен", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@MainActivity, MapActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } catch (e: Exception) {
+                        Toast.makeText(this@MainActivity, "Ошибка входа: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }
         // Кнопка Google
         findViewById<AppCompatButton>(R.id.btn_google).setOnClickListener {
             // Здесь логика для входа через Google
-            android.widget.Toast.makeText(this, "Вход через Google", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Вход через Google", Toast.LENGTH_SHORT).show()
             // TODO: Добавить Google авторизацию
         }
         // Текст "Зарегистрироваться"
         findViewById<TextView>(R.id.tv_register).setOnClickListener {
             // Здесь логика для регистрации
-            android.widget.Toast.makeText(this, "Переход к регистрации", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Переход к регистрации", Toast.LENGTH_SHORT).show()
             // TODO: Открыть экран регистрации
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)

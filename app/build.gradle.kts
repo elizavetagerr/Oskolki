@@ -31,6 +31,7 @@ android {
         val mapsApiKey = secrets.getProperty("MAPS_API_KEY") ?: ""
 
         buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildConfigField("String", "BASE_URL", "\"http://192.168.1.7:8080/\"")
     }
 
     buildTypes {
@@ -64,4 +65,18 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.0")
     implementation("androidx.camera:camera-lifecycle:1.3.0")
     implementation("androidx.camera:camera-view:1.3.0")
+
+    // Network & Coroutines
+    implementation(libs.retrofit)
+    implementation(libs.okhttp)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.gson.converter)
+    implementation(libs.coroutines.android)
+    implementation(libs.lifecycle.runtime.ktx)
+
+    // ARCore
+    implementation(libs.arcore)
+
+    // Glide for images
+    implementation(libs.glide)
 }

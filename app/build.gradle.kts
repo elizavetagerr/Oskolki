@@ -79,4 +79,5 @@ dependencies {
 
     // Glide for images
     implementation(libs.glide)
+
 }

@@ -1,106 +1,184 @@
 package com.example.oskolki
 
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.ImageView
+import android.os.Handler
+import android.os.Looper
+import android.widget.ImageButton
+import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
-import com.example.oskolki.model.MarkerDetail
-import com.example.oskolki.network.RetrofitClient
-import kotlinx.coroutines.launch
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ReviewActivity : AppCompatActivity() {
 
-    private lateinit var imageView: ImageView
-    private lateinit var titleTextView: TextView
-    private lateinit var descriptionTextView: TextView
-    private lateinit var playAudioButton: Button
-    private lateinit var audioPlayer: MediaPlayer
+    // Элементы дизайна
+    private lateinit var btnBack: ImageButton
+    private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var btnPlayPause: ImageButton
+    private lateinit var seekBar: SeekBar
+    private lateinit var tvTime: TextView
+
+    // Аудио плеер
+    private var mediaPlayer: MediaPlayer? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var isUserSeeking = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_review)
 
-        val markerId = intent.getStringExtra("marker_id")
+        // Инициализация View
+        initViews()
+        setupBottomNavigation()
+        setupAudioPlayer()
 
-        imageView = findViewById(R.id.iv_image)
-        titleTextView = findViewById(R.id.tv_title)
-        descriptionTextView = findViewById(R.id.tv_description)
-        playAudioButton = findViewById(R.id.btn_play_audio)
-
-        audioPlayer = MediaPlayer()
-
-        playAudioButton.setOnClickListener {
-            toggleAudio()
-        }
-
-        if (!markerId.isNullOrEmpty()) {
-            loadMarkerDetail(markerId)
-        } else {
-            Toast.makeText(this, "Ошибка: ID метки не указан", Toast.LENGTH_SHORT).show()
+        // Кнопка назад
+        btnBack.setOnClickListener {
             finish()
         }
     }
 
-    private fun loadMarkerDetail(markerId: String) {
-        lifecycleScope.launch {
-            try {
-                val detail = RetrofitClient.apiService.getFragmentDetail(markerId)
+    private fun initViews() {
+        btnBack = findViewById(R.id.btn_back)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
+        btnPlayPause = findViewById(R.id.btn_play_pause)
+        seekBar = findViewById(R.id.seek_bar)
+        tvTime = findViewById(R.id.tv_time)
+    }
 
-                titleTextView.text = detail.text ?: "Без названия"
-                descriptionTextView.text = "Создано: ${detail.createdAt}"
+    private fun setupBottomNavigation() {
+        bottomNavigation.selectedItemId = R.id.nav_osk
 
-                val firstPhotoUrl = detail.photoUrls?.firstOrNull()
-                if (firstPhotoUrl != null) {
-                    Glide.with(this@ReviewActivity)
-                        .load(firstPhotoUrl)
-                        .into(imageView)
+        bottomNavigation.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_osk -> {
+                    startActivity(Intent(this, FoundOskActivity::class.java))
+                    finish()
+                    true}
+                R.id.nav_edit -> {
+                    startActivity(Intent(this, EditOskolokActivity::class.java))
+                    finish()
+                    true
                 }
-
-                if (detail.audioUrl != null) {
-                    loadAudio(detail.audioUrl)
-                } else {
-                    playAudioButton.isEnabled = false
-                    playAudioButton.text = "Аудио недоступно"
+                R.id.nav_map -> {
+                    startActivity(Intent(this, MapActivity::class.java))
+                    finish()
+                    true
                 }
-
-            } catch (e: Exception) {
-                Toast.makeText(this@ReviewActivity, "Ошибка загрузки деталей", Toast.LENGTH_SHORT).show()
+                R.id.nav_cam -> {
+                    startActivity(Intent(this, CameraActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
+                    true
+                }
+                else -> false
             }
         }
     }
 
-    private fun loadAudio(audioUrl: String) {
+    private fun setupAudioPlayer() {
         try {
-            audioPlayer.reset()
-            audioPlayer.setDataSource(audioUrl)
-            audioPlayer.prepareAsync()
-            audioPlayer.setOnPreparedListener {
-                playAudioButton.text = "Воспроизвести аудио"
+            // Создаем MediaPlayer
+            mediaPlayer = MediaPlayer()
+
+            // Загружаем аудио из папки raw
+            val afd = resources.openRawResourceFd(R.raw.audio_example)
+            mediaPlayer?.apply {
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                afd.close()
+                prepare()
             }
+
+            // Настраиваем SeekBar
+            val duration = mediaPlayer?.duration ?: 0
+            seekBar.max = duration
+            tvTime.text = formatTime(duration)
+
+            // Обновляем SeekBar во время воспроизведения
+            updateSeekBar()
+
+            // Обработка перемотки
+            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    if (fromUser) {
+                        mediaPlayer?.seekTo(progress)
+                        tvTime.text = formatTime(progress)
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    isUserSeeking = true
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    isUserSeeking = false
+                }
+            })
+
+            // Кнопка Play/Pause
+            btnPlayPause.setOnClickListener {
+                togglePlayback()
+            }
+
+            // Когда аудио закончилось
+            mediaPlayer?.setOnCompletionListener {
+                btnPlayPause.setImageResource(R.drawable.ic_play)
+                seekBar.progress = 0
+                tvTime.text = formatTime(0)
+            }
+
         } catch (e: Exception) {
-            playAudioButton.isEnabled = false
-            playAudioButton.text = "Аудио недоступно"
+            e.printStackTrace()
+            // Если аудио нет, скрываем плеер
+            findViewById<android.view.View>(R.id.player_container).visibility = android.view.View.GONE
         }
     }
 
-    private fun toggleAudio() {
-        if (audioPlayer.isPlaying) {
-            audioPlayer.pause()
-            playAudioButton.text = "Продолжить"
+    private fun updateSeekBar() {
+        handler.post(object : Runnable {
+            override fun run() {
+                if (mediaPlayer?.isPlaying == true && !isUserSeeking) {
+                    val currentPosition = mediaPlayer?.currentPosition ?: 0
+                    seekBar.progress = currentPosition
+                    tvTime.text = formatTime(currentPosition)
+                }
+                handler.postDelayed(this, 500)
+            }
+        })
+    }
+
+    private fun togglePlayback() {
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+            btnPlayPause.setImageResource(R.drawable.ic_play)
         } else {
-            audioPlayer.start()
-            playAudioButton.text = "Пауза"
+            mediaPlayer?.start()
+            btnPlayPause.setImageResource(R.drawable.ic_pause)
         }
+    }
+
+    private fun formatTime(millis: Int): String {
+        val seconds = (millis / 1000) % 60
+        val minutes = (millis / 1000) / 60
+        return String.format("%d:%02d", minutes, seconds)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mediaPlayer?.pause()
+        btnPlayPause.setImageResource(R.drawable.ic_play)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        audioPlayer.release()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        handler.removeCallbacksAndMessages(null)
     }
 }

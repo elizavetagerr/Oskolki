@@ -71,7 +71,8 @@ class CameraActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_osk -> {
-                    Toast.makeText(this, "Раздел в разработке", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, FoundOskActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_edit -> {
@@ -89,14 +90,14 @@ class CameraActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    Toast.makeText(this, "Раздел в разработке", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
                     true
                 }
                 else -> false
             }
         }
     }
-
     private fun startCamera() {
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture?.addListener({

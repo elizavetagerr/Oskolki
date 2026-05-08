@@ -35,6 +35,12 @@
         <activity android:name=".EditOskolokActivity" />
         <activity android:name=".CameraActivity" />
         <activity android:name=".ReviewActivity" />
+        <activity
+            android:name="com.example.oskolki.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FoundOskActivity"
+            android:exported="false" />
 
     </application>
 

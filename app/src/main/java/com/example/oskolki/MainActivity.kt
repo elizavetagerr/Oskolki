@@ -32,6 +32,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<AppCompatButton>(R.id.btn_login).setOnClickListener {
             val email = findViewById<EditText>(R.id.et_email).text.toString()
             val password = findViewById<EditText>(R.id.et_password).text.toString()
+            val intent = Intent(this@MainActivity, MapActivity::class.java)
+            startActivity(intent)
+            finish()
 
             // Простая проверка на пустые поля
             if (email.isEmpty() || password.isEmpty()) {

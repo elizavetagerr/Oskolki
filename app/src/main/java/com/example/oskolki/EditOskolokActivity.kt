@@ -19,7 +19,8 @@ class EditOskolokActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_osk -> {
-                    Toast.makeText(this, "Раздел в разработке", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, FoundOskActivity::class.java))
+                    finish()
                     true
                 }
                 R.id.nav_edit -> {
@@ -38,7 +39,8 @@ class EditOskolokActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    Toast.makeText(this, "Раздел в разработке", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
                     true
                 }
                 else -> false

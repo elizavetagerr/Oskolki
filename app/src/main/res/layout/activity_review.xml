@@ -1,47 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#00FFFFFF"
+    tools:context=".ReviewActivity">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/login_screen"
+        android:scaleType="centerCrop"
+        android:contentDescription="Фоновое изображение" />
+    <!-- ==================== ВЕРХНЯЯ ПАНЕЛЬ ==================== -->
+
+    <!-- Кнопка "Назад" -->
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_rounded_button"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <!-- ==================== КАРТОЧКА АВТОРА ==================== -->
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/layout_author"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_back">
 
-        <ImageView
-            android:id="@+id/iv_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:background="#F0F0F0" />
+        <!-- Контейнер для аватара -->
+        <FrameLayout
+            android:id="@+id/fl_avatar_container"
+            android:layout_width="48dp"
+            android:layout_height="48dp">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="match_parent"
+            <!-- Реальная аватарка (поверх) -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/avatar_user"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/circleImageViewSmall" />
+
+        </FrameLayout>
+
+        <!-- Информация об авторе -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#1F2937" />
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:textColor="#4B5563" />
+            <TextView
+                android:id="@+id/tv_author_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Дмитрий Заручевский"
+                android:textSize="18sp"
+                android:textColor="#FF101828"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif" />
 
-        <Button
-            android:id="@+id/btn_play_audio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Воспроизвести аудио" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
+                <ImageView
+                    android:id="@+id/iv_calendar_icon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_calendar" />
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="5 марта 2026"
+                    android:textSize="14sp"
+                    android:textColor="#FF6A7282"
+                    android:fontFamily="sans-serif" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
-</ScrollView>
+    <!-- ==================== ЛОКАЦИЯ ==================== -->
+
+    <LinearLayout
+        android:id="@+id/layout_location"
+        android:layout_width="425dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:background="#FFF9FAFB"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_author">
+
+        <ImageView
+            android:id="@+id/iv_location_icon"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_map" />
+
+        <TextView
+            android:id="@+id/tv_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:text="Политехническая улица, 29 к2 лит Д"
+            android:textColor="#FF4A5565"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- ==================== ТЕКСТ ОТЗЫВА ==================== -->
+
+    <ScrollView
+        android:id="@+id/sv_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_location">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_content_part1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Привет, Саша и Дима. Надеюсь вы не сидите ночью за бэкендом, сон - это важно. \n #послание #cон #астахов_прими_пожалуйста"
+                android:textSize="16sp"
+                android:textColor="#FF1E2939"
+                android:fontFamily="sans-serif"
+                android:lineSpacingExtra="4dp" />
+
+            <ImageView
+                android:id="@+id/iv_image"
+                android:layout_width="343dp"
+                android:layout_height="200dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#F0F0F0"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:src="@drawable/ic_photo"
+                app:layout_constraintTop_toBottomOf="@id/layout_author" />
+
+            <!-- Кастомный аудиоплеер -->
+            <LinearLayout
+                android:id="@+id/player_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_player"
+                android:padding="12dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Кнопка Play/Pause -->
+                <ImageButton
+                    android:id="@+id/btn_play_pause"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_play"
+                    android:background="@drawable/bg_play_button"
+                    android:contentDescription="Play" />
+
+                <!-- Полоска прогресса -->
+                <SeekBar
+                    android:id="@+id/seek_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp" />
+
+                <!-- Текст времени -->
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0:00"
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- ==================== НИЖНЯЯ НАВИГАЦИЯ ==================== -->
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:menu="@menu/bottom_nav_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,26 +23,28 @@ class RegisterActivity : AppCompatActivity() {
             val confirmPassword = findViewById<EditText>(R.id.et_confirm_password_reg).text.toString()
 
             if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                android.widget.Toast.makeText(this, "Заполните все поля", android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Заполните все поля", android.widget.Toast.LENGTH_SHORT).show()
             } else if (password != confirmPassword) {
-                android.widget.Toast.makeText(this, "Пароли не совпадают", android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Пароли не совпадают", android.widget.Toast.LENGTH_SHORT).show()
+            } else if(password.length < 6) {
+                Toast.makeText(this, "Пароль должен содержать не менее 6 символов", Toast.LENGTH_SHORT).show()
             } else {
                 lifecycleScope.launch {
                     try {
                         val response = RetrofitClient.apiService.register(LoginRequest(email, password))
-                    val sharedPref = getSharedPreferences("auth_prefs", MODE_PRIVATE)
-                    with(sharedPref.edit()) {
-                        putString("token", response.token)
-                        putString("user_id", response.user.id)
-                        apply()
+                        val sharedPref = getSharedPreferences("auth_prefs", MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("token", response.token)
+                            putString("user_id", response.user.id)
+                            apply()
+                        }
+                        Toast.makeText(this@RegisterActivity, "Вход выполнен", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@RegisterActivity, MapActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } catch (e: Exception) {
+                        Toast.makeText(this@RegisterActivity, "Ошибка входа: ${e.message}", Toast.LENGTH_LONG).show()
                     }
-                    Toast.makeText(this@RegisterActivity, "Вход выполнен", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@RegisterActivity, MapActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                } catch (e: Exception) {
-                    Toast.makeText(this@RegisterActivity, "Ошибка входа: ${e.message}", Toast.LENGTH_LONG).show()
-                }
                 }
             }
         }

@@ -2,7 +2,18 @@ package com.example.oskolki.model
 
 import com.google.gson.annotations.SerializedName
 
-data class Marker(
+data class FragmentRequest(
+    @SerializedName("text")
+    val text: String,
+    
+    @SerializedName("lat")
+    val lat: Double,
+    
+    @SerializedName("lng")
+    val lng: Double
+)
+
+data class FragmentResponse(
     @SerializedName("id")
     val id: String,
     
@@ -22,8 +33,5 @@ data class Marker(
     val createdAt: String,
     
     @SerializedName("updated_at")
-    val updatedAt: String,
-
-    @SerializedName("expires_at")
-    val expiresAt: String? = null
+    val updatedAt: String
 )

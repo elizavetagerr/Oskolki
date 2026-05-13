@@ -29,9 +29,30 @@ android {
             secrets.load(FileInputStream(secretsFile))
         }
         val mapsApiKey = secrets.getProperty("MAPS_API_KEY") ?: ""
+        val googleClientId = secrets.getProperty("GOOGLE_CLIENT_ID") ?: ""
 
         buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
-        buildConfigField("String", "BASE_URL", "\"http://192.168.1.7:8080/\"")
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"$googleClientId\"")
+        buildConfigField("String", "BASE_URL", "\"https://oskolki.alexavr.ru/\"")
+
+        // Signing config
+        signingConfigs {
+            create("release") {
+                try {
+                    val keystoreProps = Properties()
+                    val keystoreFile = rootProject.file("keystore.properties")
+                    if (keystoreFile.exists()) {
+                        keystoreProps.load(FileInputStream(keystoreFile))
+                        storeFile = file(keystoreProps.getProperty("storeFile"))
+                        storePassword = keystoreProps.getProperty("storePassword")
+                        keyAlias = keystoreProps.getProperty("keyAlias")
+                        keyPassword = keystoreProps.getProperty("keyPassword")
+                    }
+                } catch (e: Exception) {
+                    // Signing disabled if keystore.properties not found
+                }
+            }
+        }
     }
 
     buildTypes {
@@ -41,6 +62,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -70,7 +92,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation(libs.gson.converter)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation(libs.coroutines.android)
     implementation(libs.lifecycle.runtime.ktx)
 
@@ -79,5 +101,13 @@ dependencies {
 
     // Glide for images
     implementation(libs.glide)
+    implementation("com.github.bumptech.glide:okhttp3-integration:4.15.1")
+    
+    // ExoPlayer for audio with auth support
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-datasource-okhttp:1.2.0")
+
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
 }

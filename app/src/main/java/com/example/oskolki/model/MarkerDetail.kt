@@ -28,5 +28,8 @@ data class MarkerDetail(
     val photoUrls: List<String>? = null,
 
     @SerializedName("sound_url")
-    val audioUrl: String? = null
+    val audioUrl: String? = null,
+
+    @SerializedName("expires_at")
+    val expiresAt: String? = null
 )

@@ -24,21 +24,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
         <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Музей истории"
-            android:textSize="20sp"
-            android:textColor="#FF0A0A0A"
-            android:textStyle="bold"
-            android:fontFamily="Inter"
-            android:gravity="center_horizontal" />
-
-        <TextView
             android:id="@+id/tv_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:text="Политехническая улица, 29 к2 лит Д"
             android:textSize="14sp"
             android:textColor="#FF4A5565"

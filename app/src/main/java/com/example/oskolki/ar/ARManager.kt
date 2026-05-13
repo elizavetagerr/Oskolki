@@ -5,9 +5,14 @@ import android.content.Intent
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
 import com.example.oskolki.ReviewActivity
 import com.example.oskolki.model.Marker
-import java.util.concurrent.Executors
+import com.example.oskolki.network.RetrofitClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ARManager(
     private val context: Context,
@@ -15,9 +20,10 @@ class ARManager(
 ) {
     private val markers = mutableListOf<Marker>()
     private val markerViews = mutableMapOf<String, MarkerView>()
+    private val foundMarkerIds = mutableSetOf<String>()
     private var currentAzimuth: Float = 0f
     private var currentLocation: android.location.Location? = null
-    private val executor = Executors.newSingleThreadExecutor()
+    private var isDestroyed = false
 
     fun loadMarkers(markers: List<Marker>) {
         this.markers.clear()
@@ -25,65 +31,108 @@ class ARManager(
     }
 
     fun updateMarkers(location: android.location.Location, azimuth: Float) {
+        if (isDestroyed) return
         currentLocation = location
         currentAzimuth = azimuth
-
-        executor.execute {
-            updateMarkerViews()
-        }
+        updateMarkerViews()
     }
 
     private fun updateMarkerViews() {
-        if (currentLocation == null) return
+        val loc = currentLocation
+        val azi = currentAzimuth
+        Log.d("ARManager", "updateMarkerViews loc=$loc, azimuth=$azi, markersCount=${markers.size}, viewsCount=${markerViews.size}")
 
-        container.post {
-            markerViews.values.forEach {
-                container.removeView(it)
-            }
-            markerViews.clear()
+        if (loc == null) {
+            Log.w("ARManager", "Location is null, skipping update")
+            return
+        }
 
-            markers.forEach { marker ->
-                val distance = MathUtils.calculateDistance(currentLocation!!, marker)
+        val toRemove = markerViews.keys.toMutableSet()
 
-                if (distance <= 500f) {
-                    val markerAzimuth = MathUtils.calculateAzimuth(currentLocation!!, marker)
-                    val diff = MathUtils.calculateAzimuthDifference(markerAzimuth, currentAzimuth)
+        markers.forEach { marker ->
+            val distance = MathUtils.calculateDistance(loc, marker)
+            Log.d("ARManager", "Marker ${marker.id}: dist=${distance}, azimDiff=${MathUtils.calculateAzimuthDifference(MathUtils.calculateAzimuth(loc, marker), azi)}")
 
-                   // if (Math.abs(diff) <= 30f) {
-                        createMarkerView(marker, distance.toDouble(), diff)
-                    //}
+            if (distance <= 500f) {
+                toRemove.remove(marker.id)
+
+                val markerAzimuth = MathUtils.calculateAzimuth(loc, marker)
+                val diff = MathUtils.calculateAzimuthDifference(markerAzimuth, azi)
+
+                val existing = markerViews[marker.id]
+                if (existing != null) {
+                    updateMarkerPosition(existing, diff)
+                } else {
+                    createMarkerView(marker, distance.toDouble(), diff)
                 }
             }
+        }
+
+        toRemove.forEach { id ->
+            markerViews[id]?.let {
+                container.removeView(it)
+                markerViews.remove(id)
+            }
+        }
+    }
+
+    private fun updateMarkerPosition(view: MarkerView, azimuthDiff: Float) {
+        val screenWidth = container.width
+        val centerX = screenWidth / 2f
+        val offset = (azimuthDiff / 60f) * centerX
+        val x = centerX + offset
+
+        (view.layoutParams as? FrameLayout.LayoutParams)?.apply {
+            leftMargin = (x - 50).toInt()
+            view.layoutParams = this
         }
     }
 
     private fun createMarkerView(marker: Marker, distance: Double, azimuthDiff: Float) {
         val view = MarkerView(context, marker, distance)
 
-        val screenWidth = container.width
-        val centerX = screenWidth / 2f
-        val offset = (azimuthDiff / 60f) * centerX
-        val x = centerX + offset
+        updateMarkerPosition(view, azimuthDiff)
+        if (view.layoutParams == null) {
+            view.layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
 
-        val params = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        params.leftMargin = (x - 50).toInt()
-        params.topMargin = 300
+        (view.layoutParams as FrameLayout.LayoutParams).topMargin = container.height / 3;
 
-        view.layoutParams = params
         container.addView(view)
         markerViews[marker.id] = view
 
         view.setOnClickListener {
-            val intent = Intent(context, ReviewActivity::class.java)
-            intent.putExtra("marker_id", marker.id)
-            context.startActivity(intent)
+            if (foundMarkerIds.contains(marker.id)) return@setOnClickListener
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    withContext(Dispatchers.IO) {
+                        RetrofitClient.apiService.markFragmentFound(marker.id)
+                    }
+                    foundMarkerIds.add(marker.id)
+                    Toast.makeText(context, "Осколок найден!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(context, ReviewActivity::class.java)
+                    intent.putExtra("fragment_id", marker.id)
+                    context.startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e("ARManager", "Error marking fragment as found", e)
+                    Toast.makeText(context, "Ошибка", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
     fun onDestroy() {
-        executor.shutdown()
+        isDestroyed = true
+        container.post {
+            markerViews.values.forEach {
+                container.removeView(it)
+            }
+            markerViews.clear()
+        }
+        markers.clear()
     }
 }

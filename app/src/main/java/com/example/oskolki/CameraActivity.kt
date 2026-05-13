@@ -150,7 +150,7 @@ class CameraActivity : AppCompatActivity() {
                     markers = RetrofitClient.apiService.getFragments(
                         lat = currentLocation.latitude,
                         lng = currentLocation.longitude,
-                        radius = 50
+                        radius = 1000
                     )
                     arManager.loadMarkers(markers)
                     Log.d("CameraActivity", "Loaded ${markers.size} markers")
@@ -172,7 +172,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleOrientationUpdate(orientation: FloatArray) {
+    private fun handleOrientationUpdate(orientation: Float) {
         updateMarkers()
     }
 
@@ -180,7 +180,7 @@ class CameraActivity : AppCompatActivity() {
         val currentLocation = locationHelper.getCurrentLocation() ?: return
         val currentOrientation = sensorHelper.getCurrentOrientation() ?: return
 
-        arManager.updateMarkers(currentLocation, currentOrientation[0])
+        arManager.updateMarkers(currentLocation, currentOrientation)
     }
 
     private fun calculateDistance(loc1: android.location.Location, loc2: android.location.Location): Double {
@@ -214,5 +214,6 @@ class CameraActivity : AppCompatActivity() {
         super.onDestroy()
         locationHelper.stopLocationUpdates()
         sensorHelper.stopSensorUpdates()
+        arManager.onDestroy()
     }
 }

@@ -114,4 +114,33 @@ class LocationHelper(private val context: Context) {
     fun getCurrentLocation(): Location? {
         return currentLocation
     }
+
+    fun getCurrentLocation(callback: (Location?) -> Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            callback(null)
+            return
+        }
+
+        try {
+            val lastGps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val lastNetwork = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            
+            val bestLast = when {
+                lastGps != null && lastNetwork != null -> 
+                    if (lastGps.time > lastNetwork.time) lastGps else lastNetwork
+                lastGps != null -> lastGps
+                lastNetwork != null -> lastNetwork
+                else -> null
+            }
+            
+            if (bestLast != null) {
+                currentLocation = bestLast
+                callback(bestLast)
+            } else {
+                startLocationUpdates(callback)
+            }
+        } catch (e: SecurityException) {
+            callback(null)
+        }
+    }
 }
